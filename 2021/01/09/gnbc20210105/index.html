@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"halfdayfree.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="IntroductionGeneralized Naïve Bayes Classifier (GNBC) is a subgroup of Generalized Additive Model (GAM). The method is specifically designed for binary classification problems commonly found in credit">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Generalized Naïve Bayes Classifier (GNBC) modeling methodology for Classification Model">
+<meta property="og:url" content="http://halfdayfree.com/2021/01/09/gnbc20210105/index.html">
+<meta property="og:site_name" content="楚江孤客">
+<meta property="og:description" content="IntroductionGeneralized Naïve Bayes Classifier (GNBC) is a subgroup of Generalized Additive Model (GAM). The method is specifically designed for binary classification problems commonly found in credit">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2021-01-09T05:10:55.716Z">
+<meta property="article:modified_time" content="2021-01-09T05:10:55.752Z">
+<meta property="article:author" content="HalfDayFree">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://halfdayfree.com/2021/01/09/gnbc20210105/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>Generalized Naïve Bayes Classifier (GNBC) modeling methodology for Classification Model | 楚江孤客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta custom-logo">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">楚江孤客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">We will serve the Lord</p>
+      <a>
+        <img class="custom-logo-image" src="/uploads/joven.jpg" alt="楚江孤客">
+      </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://halfdayfree.com/2021/01/09/gnbc20210105/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/myavatar.gif">
+      <meta itemprop="name" content="HalfDayFree">
+      <meta itemprop="description" content="技术笔记+生活点滴">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="楚江孤客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Generalized Naïve Bayes Classifier (GNBC) modeling methodology for Classification Model
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2021-01-09 05:10:55" itemprop="dateCreated datePublished" datetime="2021-01-09T05:10:55+00:00">2021-01-09</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h3 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h3><p>Generalized Naïve Bayes Classifier (GNBC) is a subgroup of Generalized Additive Model (GAM). The method is specifically designed for binary classification problems commonly found in credit scoring and marketing applications. GNBC turns out to be a powerful tool for both exploratory and predictive analysis. It can generate accurate predictions through a flexible, non-parametric fitting procedure, while being able to uncover hidden patterns in the data.</p>
+<p>Different from Logistic regression modeling method, GNBC is non-parametric fitting process which does not put any restrictions on the relationship between the independent variables and the dependent variable. This makes the GNBC much more flexible than traditional linear and non-linear regression, and allows it to uncover hidden patterns in the data. Moreover, the GNBC retains the additive structure of the Naive Bayes Classification (NBC) which means that it does not suffer from the problems of dimensionality that are common with other nonparametric techniques.</p>
+<h3 id="Methodology"><a href="#Methodology" class="headerlink" title="Methodology"></a>Methodology</h3><p>The Basic idea behind the GNBC methodology is from Naïve Bayes Classifier. When the dependent variable is binary, a sigmoid function is usually used to link the probability and the independent variable as below:</p>
+<p>$$\small\begin{equation}\label{eq1}<br>log(Odds) = \beta _{0} + \beta _{1} \cdot X _{i}<br>\end{equation}$$</p>
+<p>The equation above is a typical logistic regression model which shows the $log(odds)$ is a linear combination of the independent variables .</p>
+<p>On the other hand, starting from the conditionally probability theory, the above equation can also be rewritten to the following:</p>
+<p>$$\small\begin{equation}\label{eq2}<br>\begin{aligned}<br>log &amp;\left ( \frac{Pr(Y=1|X=x_i)}{Pr(Y=0|X=x_i)} \right ) \\<br>&amp;= log\left ( \frac{Pr(Y=1)}{Pr(Y=0)} \right ) \\<br>&amp;+ log\left ( \frac{Pr(X=x_i|Y=1)}{Pr(X=x_i|Y=0)} \right )<br>\end{aligned}<br>\end{equation}$$</p>
+<p>Where left-hand side of the equation represents the log(odds), first term on right is a constant which only related to distribution of 1 and 0&#39;s in the population, the second term, which is given the name – Weight of evidence (WOE), or naïve function in this process.</p>
+<p>When there are multiple independent variables and assuming they are independent of each (this is a very unrealistic assumption), the right-hand side of the equation becomes a constant plus sum of WOE of each independent variable, shown as below:</p>
+<p>$$\small\begin{equation}\label{eq3}<br>\begin{aligned}<br>log &amp;\left ( \frac{Pr(Y=1|X_1=x_{1i},X_2=x_{2i},… )}{Pr(Y=0|X_1=x_{1i},X_2=x_{2i},… )} \right ) \\<br>&amp;= log\left ( \frac{Pr(Y=1)}{Pr(Y=0)} \right ) \\<br>&amp;+ log\left ( \frac{Pr(X_1=x_{1i}|Y=1)}{Pr(X1=x_{1i}|Y=0)} \right ) \\<br>&amp;+ log\left ( \frac{Pr(X_2=x_{2i}|Y=1)}{Pr(X2=x_{2i}|Y=0)} \right ) \\<br>&amp;+ …<br>\end{aligned}<br>\end{equation}$$</p>
+<p>Equation above is the foundation of classification modeling techniques call Naïve Bayer Classifier (NBC).</p>
+<p>Due to the factor that assumptions in the NBC modeling is usually not satisfied, a two-stage process is applied to relax the assumptions.</p>
+<p><strong>a. Smoothing of the naïve function</strong></p>
+<p>Weight of evidence, or Naïve function, depends on the binning process (i.e., create groups for continuous variables or combine categories for categorical variables). Therefore, first stage of the process is try to smooth the WOE for each bin so that naïve function is a monotonic function of the independent variable, or at most, a parabolic shape, this will make sure simple relationship between the original variables and the naïve function. The methodology to do this is through smooth spline, e.g, take 60% (or any specific percent) of the adjacent area any given point and smooth the naïve function using a predefined kernel function.</p>
+<p><strong>b. Adjust the naïve function</strong></p>
+<p>Smoothing the naïve function only gives the freedom of moving the naïve function parallelly, but cannot introduce any rotation. To make the naïve function fit the dependent variable better, an adjustment process is applied to the naïve function. i.e., , where $g(x)$ is the smoothed naïve function. This is done by fit a logistic regression between naïve function and the dependent variable.</p>
+<p>$$\small\begin{equation}\label{eq4}<br> log(odds) = constant + g(x_1)_{adj} + g(x_2)_{adj} + …<br> \end{equation}$$</p>
+<p>The iteration process keeps running until a given converge criterial is satisfied and no more variable can be selected into the model. And the final model is in a generalized additive model format:</p>
+<h3 id="GNBC-and-logistic-regression-comparison"><a href="#GNBC-and-logistic-regression-comparison" class="headerlink" title="GNBC and logistic regression comparison"></a>GNBC and logistic regression comparison</h3><p>Compared with logistic regression, GNBC is less sensitive to outliers, missing values, or type of the variables (numeric or categorical) since it includes a binning process. Based on our experience, the performance of the GNBC model is comparable to performance of a fine-tuned logistic regression model, and the prediction power is at least the same as logistic model, if not better.</p>
+<p>Since GNBC is a subset of the Generalized Additive Model (GAM) model, it inherits the advantages of GAM model, for example, it may still give satisfied results even when the relationship between independent variable and independent variable are nonlinear.</p>
+<h3 id="Conclusion"><a href="#Conclusion" class="headerlink" title="Conclusion"></a>Conclusion</h3><p>Due to the reasons mentioned above, GNBC can greatly improve the efficiency of the modeling process while still give a satisfactory model performance, and that&#39;s is the reason we are trying to introduce and apply this technique in our modeling process.</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/01/09/blogsite_guide_4/" rel="prev" title="Setting up a working blog site using Hexo/Nginx/AWS from beginning (4/7)">
+      <i class="fa fa-chevron-left"></i> Setting up a working blog site using Hexo/Nginx/AWS from beginning (4/7)
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/01/09/blogsite_guide_3/" rel="next" title="Setting up a working blog site using Hexo/Nginx/AWS from beginning (3/7)">
+      Setting up a working blog site using Hexo/Nginx/AWS from beginning (3/7) <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#Introduction"><span class="nav-number">1.</span> <span class="nav-text">Introduction</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Methodology"><span class="nav-number">2.</span> <span class="nav-text">Methodology</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#GNBC-and-logistic-regression-comparison"><span class="nav-number">3.</span> <span class="nav-text">GNBC and logistic regression comparison</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Conclusion"><span class="nav-number">4.</span> <span class="nav-text">Conclusion</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="HalfDayFree"
+      src="/images/myavatar.gif">
+  <p class="site-author-name" itemprop="name">HalfDayFree</p>
+  <div class="site-description" itemprop="description">技术笔记+生活点滴</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">6</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+  </nav>
+</div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      title
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="http://halfdayfree.com/" title="http:&#x2F;&#x2F;halfdayfree.com">Title</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">HalfDayFree</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>
